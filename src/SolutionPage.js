@@ -1,23 +1,7 @@
 import React from 'react';
 import './SolutionPage.css';
 
-const SolutionPage = () => {
-  // Demo Project Data (In actual app, this will come from props or API)
-  const project = {
-    title: 'Smart Campus Waste Management System',
-    category: 'IoT & CleanTech',
-    studentName: 'Rahul Sharma & Team',
-    college: 'ABC Institute of Technology',
-    submittedDate: '12 Oct 2026',
-    problemStatement:
-      'Campus dustbins frequently overflow, causing unhygienic conditions and manual inspection wastes a lot of time and resources.',
-    solutionOverview:
-      'An IoT-based dustbin monitor with ultrasonic sensors that tracks trash levels in real-time and alerts waste management staff when bins reach 80% capacity.',
-    techStack: ['React JS', 'Node.js', 'ESP8266 Microcontroller', 'Firebase', 'IoT Sensors'],
-    demoLink: 'https://github.com',
-    pptLink: '#',
-    status: 'Approved / Selected for Finals',
-  };
+{
 
   return (
     <div className="solution-container">

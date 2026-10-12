@@ -5,38 +5,44 @@ import SolutionSubmission from './SolutionSubmission';
 import ProblemsPage from './ProblemsPage';
 import SolutionsPage from './SolutionsPage';
 import StatusDashboard from './StatusDashboard';
-import SafetyIssuePage from './SafetyIssuePage';
 import AdminDashboard from './AdminDashboard';
+import SafetyIssuePage from './SafetyIssuePage';
+import LoginPage from './LoginPage';
+import HomePage from './HomePage';
+
 import './App.css';
 
-// ── Guest user — no login required ──────────────────────────
-// role options: 'student' | 'teacher' | 'admin'
-// Change role here to switch what nav items appear
-const GUEST_USER = {
-  uid:   'guest-001',
-  name:  'Guest User',
-  email: 'guest@campus.edu',
-  role:  'admin',   // 'admin' shows all features
-};
-
 function App() {
-  const user = GUEST_USER;
-  const [page, setPage] = useState('dashboard');
+  const [page, setPage]     = useState('login');
+  const [user, setUser]     = useState(null);
+  const [showHome, setShowHome] = useState(true);
 
-  // All nav items — visible to everyone since no login
-  const navItems = [
-    { key: 'dashboard',       label: '📊 Dashboard'        },
-    { key: 'problems',        label: '📋 All Problems'      },
-    { key: 'solutions',       label: '✅ All Solutions'     },
-    { key: 'status',          label: '🔄 Track Status'      },
-    { key: 'safety',          label: '🚨 Safety Issue'      },
-    { key: 'submit-problem',  label: '➕ Submit Problem'    },
-    { key: 'submit-solution', label: '🛠 Submit Solution'   },
-    { key: 'admin',           label: '🛡 Admin Panel'       },
-  ];
+  // Show HomePage first
+  if (showHome) {
+    return <HomePage onGetStarted={() => setShowHome(false)} />;
+  }
+
+  // Show LoginPage after Get Started clicked
+  if (!user) {
+    return <LoginPage onLogin={(u) => { setUser(u); setPage('dashboard'); }} />;
+  }
 
   const roleColors = { student: '#3b82f6', teacher: '#7c3aed', admin: '#dc2626' };
   const roleLabel  = { student: '🎒 Student', teacher: '📚 Teacher', admin: '🛡 Admin' };
+
+  // Nav items with role-based visibility — runs AFTER user is confirmed not null
+  const allNavItems = [
+    { key: 'dashboard',       label: '📊 Dashboard',       roles: ['student', 'teacher', 'admin'] },
+    { key: 'problems',        label: '📋 All Problems',     roles: ['student', 'teacher', 'admin'] },
+    { key: 'solutions',       label: '✅ All Solutions',    roles: ['student', 'teacher', 'admin'] },
+    { key: 'status',          label: '🔄 Track Status',     roles: ['student', 'teacher', 'admin'] },
+    { key: 'safety',          label: '🚨 Safety Issue',     roles: ['student', 'teacher', 'admin'] },
+    { key: 'submit-problem',  label: '➕ Submit Problem',   roles: ['student', 'teacher']          },
+    { key: 'submit-solution', label: '🛠 Submit Solution',  roles: ['teacher', 'admin']            },
+    { key: 'admin',           label: '🛡 Admin Panel',      roles: ['admin']                       },
+  ];
+
+  const navItems = allNavItems.filter(item => item.roles.includes(user.role));
 
   const renderPage = () => {
     switch (page) {
@@ -84,6 +90,9 @@ function App() {
               </div>
             </div>
           </div>
+          <button className="logout-btn" onClick={() => { setUser(null); setPage('login'); setShowHome(true); }}>
+            🚪 Logout
+          </button>
         </div>
       </aside>
 

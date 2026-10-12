@@ -2,17 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { getSafetyIssues, addSafetyIssue, deleteSafetyIssue } from './store';
 
 const SAFETY_CATEGORIES = [
-  '🔥 Fire Hazard',
+  
   '⚡ Electrical Issue',
   '🚧 Structural Damage',
-  '💧 Flooding / Water Leakage',
-  '🧪 Chemical / Lab Hazard',
-  '🚑 Medical Emergency Area',
-  '🔒 Security Threat',
-  '💡 Lighting Failure',
-  '🚪 Blocked Exit / Emergency Route',
-  '🌿 Environmental Hazard',
-  '📡 Equipment Malfunction',
+  '💧Water Leakage',
+  '🧪 Chemical lab problems',
+  
+  
+  '🚪 bus related problems',
+  
   '⚠️ Other Safety Concern',
 ];
 

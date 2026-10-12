@@ -1,81 +1,72 @@
-// ─── Firebase Firestore data store ──────────────────────────────────────────
-// Collections:
-//   "problems"     — campus problems submitted by students
-//   "users"        — user profiles (name, role)
-//   "safetyIssues" — safety issue reports
+// ─── Firestore-backed Store ────────────────────────────────────────────────
+// Collections: "problems"  and  "safety"
+// All functions mirror the old in-memory API so no other file needs changing.
 
 import {
-  collection, doc,
-  addDoc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
-  query, orderBy, serverTimestamp,
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  orderBy,
+  query,
+  serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
 
-/* ══════════════════════════════════════════════════════
-   USER PROFILES  (stored in Firestore "users" collection)
-══════════════════════════════════════════════════════ */
+const PROBLEMS = 'problems';
+const SAFETY   = 'safety';
 
-export const createUserProfile = async (uid, { name, email, role }) => {
-  await setDoc(doc(db, 'users', uid), { uid, name, email, role });
-};
+// ── helper: convert Firestore doc → plain object ─────────────────────────────
+const snap = (d) => ({ id: d.id, ...d.data() });
 
-export const getUserProfile = async (uid) => {
-  const snap = await getDoc(doc(db, 'users', uid));
-  return snap.exists() ? snap.data() : null;
-};
-
-/* ══════════════════════════════════════════════════════
-   PROBLEMS  (stored in Firestore "problems" collection)
-══════════════════════════════════════════════════════ */
+// ── Problems ─────────────────────────────────────────────────────────────────
 
 export const getProblems = async () => {
-  const q    = query(collection(db, 'problems'), orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const q = query(collection(db, PROBLEMS), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(snap);
 };
 
-export const addProblem = async (problem) => {
-  const ref = await addDoc(collection(db, 'problems'), {
-    ...problem,
-    status:    'Pending',
-    solution:  '',
-    solvedBy:  '',
+export const addProblem = async (data) => {
+  const docRef = await addDoc(collection(db, PROBLEMS), {
+    ...data,
+    status: 'Pending',
     createdAt: serverTimestamp(),
   });
-  return ref.id;
+  return { id: docRef.id, ...data, status: 'Pending', createdAt: new Date() };
 };
 
-export const updateProblem = async (id, changes) => {
-  await updateDoc(doc(db, 'problems', id), changes);
+export const updateProblem = async (id, updates) => {
+  await updateDoc(doc(db, PROBLEMS, id), updates);
 };
 
 export const deleteProblem = async (id) => {
-  await deleteDoc(doc(db, 'problems', id));
+  await deleteDoc(doc(db, PROBLEMS, id));
 };
 
-/* ══════════════════════════════════════════════════════
-   SAFETY ISSUES  (stored in Firestore "safetyIssues" collection)
-══════════════════════════════════════════════════════ */
+// ── Safety Issues ─────────────────────────────────────────────────────────────
 
 export const getSafetyIssues = async () => {
-  const q    = query(collection(db, 'safetyIssues'), orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const q = query(collection(db, SAFETY), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(snap);
 };
 
-export const addSafetyIssue = async (issue) => {
-  const ref = await addDoc(collection(db, 'safetyIssues'), {
-    ...issue,
-    status:    'Reported',
+export const addSafetyIssue = async (data) => {
+  const docRef = await addDoc(collection(db, SAFETY), {
+    ...data,
+    status: 'Reported',
     createdAt: serverTimestamp(),
   });
-  return ref.id;
+  return { id: docRef.id, ...data, status: 'Reported', createdAt: new Date() };
 };
 
-export const updateSafetyIssue = async (id, changes) => {
-  await updateDoc(doc(db, 'safetyIssues', id), changes);
+export const updateSafetyIssue = async (id, updates) => {
+  await updateDoc(doc(db, SAFETY, id), updates);
 };
 
 export const deleteSafetyIssue = async (id) => {
-  await deleteDoc(doc(db, 'safetyIssues', id));
+  await deleteDoc(doc(db, SAFETY, id));
 };
